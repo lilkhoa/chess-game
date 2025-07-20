@@ -1,0 +1,102 @@
+/* Player Info Styling */
+.player-info {
+    width: 640px;
+    margin: 0 auto;
+    padding: 15px 20px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    backdrop-filter: blur(10px);
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.player-info.active-player {
+    border-color: #4CAF50;
+    box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+    background: rgba(255, 255, 255, 1);
+}
+
+#player-top {
+    margin-bottom: 15px;
+}
+
+#player-bottom {
+    margin-top: 15px;
+}
+
+/* Player Avatar */
+.player-avatar {
+    display: flex;
+    align-items: center;
+}
+
+.avatar-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.black-avatar {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+}
+
+.white-avatar {
+    background: linear-gradient(135deg, #ecf0f1, #bdc3c7);
+    color: #2c3e50;
+}
+
+/* Player Details */
+.player-details {
+    flex: 1;
+    margin-left: 15px;
+    text-align: left;
+}
+
+.player-name {
+    font-size: 18px;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 4px;
+}
+
+.player-status {
+    font-size: 14px;
+    color: #7f8c8d;
+    font-style: italic;
+    margin-bottom: 8px;
+}
+
+.active-player .player-status {
+    color: #27ae60;
+    font-weight: 600;
+}
+
+/* Captured Pieces Styling */
+.captured-pieces {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    min-height: 24px;
+    max-width: 300px;
+    overflow: hidden;
+    margin-top: 4px;
+    flex-wrap: wrap;
+}
+
+.captured-pieces:empty::before {
+    content: '';
+    display: block;
+    width: 100%;
+    height: 20px;
+}

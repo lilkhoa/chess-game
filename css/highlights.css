@@ -1,0 +1,112 @@
+/* Selected piece highlighting */
+.square.selected-piece {
+    background-color: #f7ec74 !important;
+    box-shadow: inset 0 0 0 3px #f7d23c, 0 0 10px rgba(247, 210, 60, 0.6);
+    border-radius: 4px;
+    position: relative;
+}
+
+.square.selected-piece::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(247, 236, 116, 0.8) 0%, rgba(247, 210, 60, 0.6) 100%);
+    border-radius: 4px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.square.selected-piece .piece {
+    position: relative;
+    z-index: 2;
+    filter: brightness(1.1) contrast(1.1);
+}
+
+/* Possible moves styling */
+.square.possible-move {
+    position: relative;
+    z-index: 5;
+    border: none !important;
+    box-sizing: border-box;
+}
+
+.square.possible-move::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    background-color: rgba(143, 193, 81, 0.8);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 6;
+}
+
+/* Capture move styling */
+.square.possible-move.capture-move::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(130, 151, 105, 0.3);
+    border: 4px solid rgba(130, 151, 105, 0.8);
+    border-radius: 8px;
+    transform: none;
+    pointer-events: none;
+    z-index: 6;
+    box-sizing: border-box;
+}
+
+/* Hover effects */
+.square.possible-move:hover {
+    background-color: #6ebc1c !important;
+    transition: background-color 0.2s ease;
+}
+
+
+.square.possible-move:hover::after {
+    background-color: rgba(130, 151, 105, 1) !important;
+}
+
+.square.possible-move.capture-move:hover::after {
+    background: rgba(130, 151, 105, 0.5) !important;
+    border-color: rgba(130, 151, 105, 1) !important;
+    border-width: 5px !important;
+    border-radius: 6px !important;
+}
+
+/* Check highlighting */
+.square.in-check {
+    background-color: #ff6b6b !important;
+    box-shadow: inset 0 0 0 3px #ff4757, 0 0 15px rgba(255, 71, 87, 0.7);
+    border-radius: 4px;
+    animation: checkPulse 1.5s infinite;
+}
+
+@keyframes checkPulse {
+    0%, 100% { 
+        box-shadow: inset 0 0 0 3px #ff4757, 0 0 15px rgba(255, 71, 87, 0.7);
+    }
+    50% { 
+        box-shadow: inset 0 0 0 3px #ff6b6b, 0 0 20px rgba(255, 107, 107, 0.9);
+    }
+}
+
+/* Clear highlights helper */
+.square.no-highlight {
+    background-color: inherit !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+}
+
+.square.no-highlight::before,
+.square.no-highlight::after {
+    display: none !important;
+}

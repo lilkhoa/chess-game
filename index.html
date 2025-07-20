@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess Game</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/board.css">
+    <link rel="stylesheet" href="css/pieces.css">
+    <link rel="stylesheet" href="css/highlights.css">
+    <link rel="stylesheet" href="css/controls.css">
+    <link rel="stylesheet" href="css/players.css">
+    <link rel="stylesheet" href="css/modals.css">
+    <link rel="stylesheet" href="css/moves-panel.css">
+    <link rel="stylesheet" href="css/game-mode.css">
+</head>
+
+<body>
+    <!-- Game Mode Selection Screen -->
+    <div id="game-mode-selection" class="mode-selection-overlay">
+        <div class="mode-selection-container">
+            <div class="mode-header">
+                <h1>Chess</h1>
+                <p>Choose your game mode</p>
+            </div>
+            
+            <div class="mode-options">
+                <div class="mode-card" id="single-player-mode">
+                    <div class="mode-icon">🖥️</div>
+                    <h3>1 Player</h3>
+                    <div class="mode-description">
+                        Play against computer
+                    </div>
+                </div>
+                
+                <div class="mode-card" id="two-player-mode">
+                    <div class="mode-icon">👥</div>
+                    <h3>2 Players</h3>
+                    <div class="mode-description">
+                        Play with a friend
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mode-footer">
+                <button id="start-game-button" disabled>Start Game</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Game Interface (hidden initially) -->
+    <div id="game-interface" style="display: none;">
+        <!-- Top Player (Black) -->
+        <div id="player-top" class="player-info" data-color="black">
+            <div class="player-avatar">
+                <div class="avatar-circle black-avatar">♚</div>
+            </div>
+            <div class="player-details">
+                <div class="player-name">Player 2 (Black)</div>
+                <div class="player-status">Waiting...</div>
+                <div class="captured-pieces" id="black-captured">
+                    <!-- Captured white pieces will appear here in hierarchy order -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Controls -->
+        <div id="game-controls">
+            <button id="new-game-button">⚡ New Game</button>
+            <button id="change-mode-button">🔄️ Change Mode</button>
+        </div>
+
+        <div id="chess-board">
+            <!-- Row labels (positioned inside leftmost squares) -->
+            <div class="row-label" data-label="8"></div>
+            <div class="row-label" data-label="7"></div>
+            <div class="row-label" data-label="6"></div>
+            <div class="row-label" data-label="5"></div>
+            <div class="row-label" data-label="4"></div>
+            <div class="row-label" data-label="3"></div>
+            <div class="row-label" data-label="2"></div>
+            <div class="row-label" data-label="1"></div>
+
+            <!-- Column labels (positioned inside bottom squares) -->
+            <div class="col-label" data-label="a"></div>
+            <div class="col-label" data-label="b"></div>
+            <div class="col-label" data-label="c"></div>
+            <div class="col-label" data-label="d"></div>
+            <div class="col-label" data-label="e"></div>
+            <div class="col-label" data-label="f"></div>
+            <div class="col-label" data-label="g"></div>
+            <div class="col-label" data-label="h"></div>
+
+            <!-- Moves Panel - Inside chess board container -->
+            <div id="moves-panel">
+                <div class="moves-header">
+                    <h3>Game Moves</h3>
+                </div>
+                <div id="moves-list">
+                    <div class="moves-placeholder"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Player (White) -->
+        <div id="player-bottom" class="player-info active-player" data-color="white">
+            <div class="player-avatar">
+                <div class="avatar-circle white-avatar">♔</div>
+            </div>
+            <div class="player-details">
+                <div class="player-name">Player 1 (White)</div>
+                <div class="player-status">Your turn</div>
+                <div class="captured-pieces" id="white-captured">
+                    <!-- Captured black pieces will appear here in hierarchy order -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Winner/Draw Message Container - Modified -->
+        <div id="winner-container" style="display: none;">
+            <div class="winner-overlay"></div>
+            <div class="winner-modal">
+                <button class="winner-close-btn" id="winner-close-btn">✕</button>
+                <div class="winner-icon">🏆</div>
+                <h2 class="winner-message">Game Over</h2>
+                <div class="winner-actions">
+                    <button class="winner-action-btn" id="winner-new-game">New Game</button>
+                    <button class="winner-action-btn secondary" id="winner-change-mode">Change Mode</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="promotion-selection" style="display: none;">
+            <h3>Choose promotion piece:</h3>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0"></script>
+    <script type="module" src="src/utils.js"></script>
+    <script type="module" src="src/pieces/piece.js"></script>
+    <script type="module" src="src/pieces/pawn.js"></script>
+    <script type="module" src="src/pieces/rook.js"></script>
+    <script type="module" src="src/pieces/knight.js"></script>
+    <script type="module" src="src/pieces/bishop.js"></script>
+    <script type="module" src="src/pieces/queen.js"></script>
+    <script type="module" src="src/pieces/king.js"></script>
+    <script type="module" src="src/board.js"></script>
+    <script type="module" src="src/player.js"></script>
+    <script type="module" src="src/computer.js"></script>
+    <script type="module" src="src/game.js"></script>
+    <script type="module" src="src/features/game-renderer.js"></script>
+    <script type="module" src="src/features/move-notation.js"></script>
+    <script type="module" src="src/features/pawn-promotion.js"></script>
+    <script type="module" src="src/features/piece-capture.js"></script>
+    <script type="module" src="src/features/game-mode.js"></script>
+</body>
+
+</html>

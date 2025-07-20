@@ -1,0 +1,138 @@
+.piece {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    cursor: pointer;
+    transition: transform 0.2s ease, filter 0.2s ease;
+    position: relative;
+    z-index: 7;
+}
+
+.piece:hover {
+    transform: scale(1.05);
+    filter: brightness(1.1);
+}
+
+/* White pieces */
+.piece.white-pawn {
+    background-image: url('../images/white-pawn.png');
+}
+
+.piece.white-rook {
+    background-image: url('../images/white-rook.png');
+}
+
+.piece.white-knight {
+    background-image: url('../images/white-knight.png');
+}
+
+.piece.white-bishop {
+    background-image: url('../images/white-bishop.png');
+}
+
+.piece.white-queen {
+    background-image: url('../images/white-queen.png');
+}
+
+.piece.white-king {
+    background-image: url('../images/white-king.png');
+}
+
+/* Black pieces */
+.piece.black-pawn {
+    background-image: url('../images/black-pawn.png');
+}
+
+.piece.black-rook {
+    background-image: url('../images/black-rook.png');
+}
+
+.piece.black-knight {
+    background-image: url('../images/black-knight.png');
+}
+
+.piece.black-bishop {
+    background-image: url('../images/black-bishop.png');
+}
+
+.piece.black-queen {
+    background-image: url('../images/black-queen.png');
+}
+
+.piece.black-king {
+    background-image: url('../images/black-king.png');
+}
+
+/* Captured pieces */
+.captured-piece {
+    width: 20px;
+    height: 20px;
+    background-size: cover;
+    background-position: center;
+    opacity: 0.8;
+    border-radius: 2px;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    order: 0;
+}
+
+.captured-piece:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* Piece hierarchy order */
+.captured-piece.queen { order: 1; }
+.captured-piece.rook { order: 2; }
+.captured-piece.knight { order: 3; }
+.captured-piece.bishop { order: 4; }
+.captured-piece.pawn { order: 5; }
+
+/* Captured piece images */
+.captured-piece.white-pawn {
+    background-image: url('../images/white-pawn.png');
+}
+
+.captured-piece.black-pawn {
+    background-image: url('../images/black-pawn.png');
+}
+
+.captured-piece.white-rook {
+    background-image: url('../images/white-rook.png');
+}
+
+.captured-piece.black-rook {
+    background-image: url('../images/black-rook.png');
+}
+
+.captured-piece.white-knight {
+    background-image: url('../images/white-knight.png');
+}
+
+.captured-piece.black-knight {
+    background-image: url('../images/black-knight.png');
+}
+
+.captured-piece.white-bishop {
+    background-image: url('../images/white-bishop.png');
+}
+
+.captured-piece.black-bishop {
+    background-image: url('../images/black-bishop.png');
+}
+
+.captured-piece.white-queen {
+    background-image: url('../images/white-queen.png');
+}
+
+.captured-piece.black-queen {
+    background-image: url('../images/black-queen.png');
+}
+
+.captured-piece.white-king {
+    background-image: url('../images/white-king.png');
+}
+
+.captured-piece.black-king {
+    background-image: url('../images/black-king.png');
+}

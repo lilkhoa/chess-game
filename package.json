@@ -1,0 +1,18 @@
+{
+  "name": "chess-game",
+  "version": "1.0.0",
+  "description": "A two-player chess game built with JavaScript.",
+  "main": "src/game.js",
+  "scripts": {
+    "start": "open index.html"
+  },
+  "keywords": [
+    "chess",
+    "game",
+    "javascript"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {}
+}
