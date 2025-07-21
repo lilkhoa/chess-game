@@ -192,6 +192,124 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* Color Selection for Single Player */
+.color-selection {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, margin 0.4s ease;
+    margin: 0 auto;
+    width: 100%;
+    opacity: 0;
+}
+
+.color-selection.active {
+    max-height: 200px;
+    margin: 20px auto 30px;
+    opacity: 1;
+}
+
+.color-selection-title {
+    font-size: 1.4em;
+    color: #2c3e50;
+    margin: 0 0 15px 0;
+    font-weight: 600;
+}
+
+.color-options {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+}
+
+.color-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 3px solid transparent;
+    background: rgba(255, 255, 255, 0.7);
+    width: 120px;
+}
+
+.color-option:hover {
+    transform: translateY(-3px);
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.color-option.selected {
+    border-color: #4CAF50;
+    background: rgba(248, 255, 248, 0.95);
+    box-shadow: 0 6px 18px rgba(76, 175, 80, 0.25);
+}
+
+.color-piece {
+    font-size: 3.5em;
+    margin-bottom: 10px;
+    height: 70px;
+    width: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: #f5f5f5;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.color-piece.white-king {
+    color: #333;
+    background: linear-gradient(135deg, #ffffff, #e6e6e6);
+}
+
+.color-piece.black-king {
+    color: #000;
+    background: linear-gradient(135deg, #333, #111);
+    color: white;
+}
+
+.color-option span {
+    font-weight: 600;
+    color: #333;
+    font-size: 1.05em;
+}
+
+.color-option.selected .color-piece {
+    transform: scale(1.05);
+}
+
+/* Responsive adjustments for color selection */
+@media (max-width: 640px) {
+    .color-options {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .color-option {
+        width: 80%;
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 15px;
+    }
+    
+    .color-piece {
+        font-size: 2.5em;
+        height: 50px;
+        width: 50px;
+        margin-bottom: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .color-selection.active {
+        max-height: 280px;
+    }
+}
+
 /* Responsive Design */
 @media (max-width: 640px) {
     .mode-options {

@@ -5,9 +5,10 @@ import utils from './utils.js';
 import GameRenderer from './features/game-renderer.js';
 
 class Game {
-    constructor(gameMode = 'human-vs-human') {
+    constructor(gameMode = 'human-vs-human', playerSide = 'white') {
         this.board = new Board();
         this.gameMode = gameMode;
+        this.playerSide = playerSide;
         this.setupPlayers();
         this.currentPlayerIndex = 0;
         this.isCheckMate = false;
@@ -19,10 +20,18 @@ class Game {
     setupPlayers() {
         switch (this.gameMode) {
             case 'human-vs-computer':
-                this.players = [
-                    new Player('Player 1', 'white'), 
-                    new Computer('Computer', 'black')
-                ];
+                if (this.playerSide === 'white') {
+                    this.players = [
+                        new Player('You', 'white'), 
+                        new Computer('Computer', 'black')
+                    ];
+                } else {
+                    this.players = [
+                        new Computer('Computer', 'white'),
+                        new Player('You', 'black')
+                    ];
+                    this.currentPlayerIndex = 0;
+                }
                 break;
             case 'human-vs-human': 
                 this.players = [
@@ -40,11 +49,15 @@ class Game {
         this.handleTurn(); 
     }
 
-    restart(newGameMode) {
+    restart(newGameMode, playerSide) {
         this.stop();
         
         if (newGameMode) {
             this.gameMode = newGameMode;
+        }
+        
+        if (playerSide) {
+            this.playerSide = playerSide;
         }
         
         this.board.reset();
@@ -137,7 +150,7 @@ class Game {
 let chessGame = null;
 
 document.addEventListener('newGameStarted', (event) => {
-    const { mode, sameMode } = event.detail;
+    const { mode, _, __, playerSide } = event.detail;
     
     const gameModeMap = {
         'single-player': 'human-vs-computer',
@@ -148,9 +161,9 @@ document.addEventListener('newGameStarted', (event) => {
     
     if (chessGame) {
         chessGame.stop();
-        chessGame.restart(gameMode);
+        chessGame.restart(gameMode, playerSide);
     } else {
-        chessGame = new Game(gameMode);
+        chessGame = new Game(gameMode, playerSide);
         chessGame.start();
     }
 });
