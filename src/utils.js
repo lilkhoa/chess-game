@@ -23,21 +23,21 @@ class Utils {
         return false;
     }
 
-    getValidMoves(color, piece, board) {
-        if (this.isInCheck(color, board)) {
+    getValidMoves(piece, board) {
+        if (this.isInCheck(piece.color, board)) {
             return piece.getPossibleMovesIfInCheck(board);
         } else {
-            return this.filterMovesForCheck(color, piece, board);
+            return this.filterMovesForCheck(piece, board);
         }
     }
 
-    filterMovesForCheck(color, piece, board) {
+    filterMovesForCheck(piece, board) {
         const allMoves = piece.getPossibleMoves(board);
         const validMoves = [];
 
         for (const move of allMoves) {
             if (piece.isValidPosition(move.x, move.y, board)) {
-                if (!this.wouldMoveResultInCheck(color, piece, move, board)) {
+                if (!this.wouldMoveResultInCheck(piece, move, board)) {
                     validMoves.push(move);
                 }
             }
@@ -46,7 +46,7 @@ class Utils {
         return validMoves;
     }
 
-    wouldMoveResultInCheck(color, piece, move, board) {
+    wouldMoveResultInCheck(piece, move, board) {
         const originalPosition = { ...piece.position };
         const targetPiece = board.getPieceAt(move.x, move.y);
         
@@ -54,7 +54,7 @@ class Utils {
         board.squares[originalPosition.y][originalPosition.x] = null;
         piece.position = move;
         
-        const wouldBeInCheck = this.isInCheck(color, board);
+        const wouldBeInCheck = this.isInCheck(piece.color, board);
         
         board.squares[originalPosition.y][originalPosition.x] = piece;
         board.squares[move.y][move.x] = targetPiece;
@@ -87,7 +87,7 @@ class Utils {
         if (this.isInCheck(color, board)) {
             const pieces = board.getPieceByColor(color);
             for (const piece of pieces) {
-                const validMoves = this.getValidMoves(color, piece, board);
+                const validMoves = this.getValidMoves(piece, board);
                 if (validMoves.length > 0) {
                     return false; // Player can make a move to escape check
                 }
@@ -107,7 +107,7 @@ class Utils {
         if (!this.isInCheck(color, board)) {
             const pieces = board.getPieceByColor(color);
             for (const piece of pieces) {
-                const validMoves = this.getValidMoves(color, piece, board);
+                const validMoves = this.getValidMoves(piece, board);
                 if (validMoves.length > 0) {
                     return false; // Player can make a move, hence not stalemate
                 }

@@ -35,7 +35,7 @@ class Player {
                     this.selectedPosition = position;
                     
                     // Get moves that don't result in check
-                    const possibleMoves = utils.getValidMoves(this.color, piece, board);
+                    const possibleMoves = utils.getValidMoves(piece, board);
                     GameRenderer.highlightSelectedPiece(piece);
                     GameRenderer.highlightPossibleMoves(possibleMoves);
                     this.setupMoveListeners(board, piece, position, possibleMoves, resolve);

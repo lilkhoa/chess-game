@@ -253,6 +253,16 @@ class Board extends EventTarget {
         return this.squares[y][x] || null;
     }
 
+    setPieceAt(x, y, piece) {
+        if (x < 0 || x >= 8 || y < 0 || y >= 8) {
+            return;
+        }
+        this.squares[y][x] = piece;
+        if (piece) {
+            piece.position = { x, y };
+        }
+    }
+
     getPieceByColor(color) {
         const pieces = [];
         for (let row = 0; row < 8; row++) {
@@ -279,7 +289,7 @@ class Board extends EventTarget {
     }  
 
     canPieceMoveTo(piece, targetX, targetY) {
-        const validMoves = utils.filterMovesForCheck(piece.color, piece, this);
+        const validMoves = utils.filterMovesForCheck(piece, this);
         return validMoves.some(move => move.x === targetX && move.y === targetY);
     }
 }

@@ -11,7 +11,11 @@ class GameRenderer {
         
         // Add appropriate class and set message
         winnerModal.classList.add(`${winnerColor}-wins`);
-        winnerMessage.textContent = `${winnerName} Wins!`;
+        if (winnerName === 'You') {
+            winnerMessage.textContent = `You Win!`;
+        } else {
+            winnerMessage.textContent = `${winnerName} Wins!`;
+        }
         
         // Set appropriate icon
         if (winnerColor === 'white') {

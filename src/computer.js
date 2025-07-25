@@ -7,28 +7,53 @@ class Computer {
         this.color = color;
         this.isActive = false;
         this.model = null;
+        this.searchDepth = 2; // Adjustable search depth
     }
 
     async loadModel() {
         if (!this.model) {
-            this.model = await tf.loadLayersModel('./test_model_2_js/model.json');
-            console.log('Chess AI model loaded successfully');
+            // Update to load your new position evaluation model
+            this.model = await tf.loadLayersModel('models/chess_engine_v2/model.json');
         }
         return this.model;
     }
 
     boardToTensor(board) {
-        const tensor = new Array(8);
+        // Create 14×8×8 tensor matching your Python format
+        const tensor = new Array(14);
+        for (let channel = 0; channel < 14; channel++) {
+            tensor[channel] = new Array(8);
+            for (let row = 0; row < 8; row++) {
+                tensor[channel][row] = new Array(8).fill(0);
+            }
+        }
+
+        // Fill first 12 channels with pieces (channels 0-11)
         for (let row = 0; row < 8; row++) {
-            tensor[row] = new Array(8);
             for (let col = 0; col < 8; col++) {
-                tensor[row][col] = new Array(12).fill(0); 
-                
                 const piece = board.getPieceAt(col, row);
                 if (piece) {
                     const channelIndex = this.getPieceChannelIndex(piece);
-                    tensor[row][col][channelIndex] = 1;
+                    tensor[channelIndex][row][col] = 1;
                 }
+            }
+        }
+
+        // Channel 12: White legal move destinations
+        const whitePieces = board.getPieceByColor('white');
+        for (const piece of whitePieces) {
+            const validMoves = utils.getValidMoves(piece, board);
+            for (const move of validMoves) {
+                tensor[12][move.y][move.x] = 1;
+            }
+        }
+
+        // Channel 13: Black legal move destinations
+        const blackPieces = board.getPieceByColor('black');
+        for (const piece of blackPieces) {
+            const validMoves = utils.getValidMoves(piece, board);
+            for (const move of validMoves) {
+                tensor[13][move.y][move.x] = 1;
             }
         }
         return tensor;
@@ -46,89 +71,29 @@ class Computer {
         return pieceMap[piece.color][piece.constructor.name];
     }
 
-    outputToMove(prediction, board) {
-        const predictionData = prediction.dataSync();
-        
-        let bestMoveIndex = 0;
-        let bestScore = predictionData[0];
-        
-        for (let i = 1; i < predictionData.length; i++) {
-            if (predictionData[i] > bestScore) {
-                bestScore = predictionData[i];
-                bestMoveIndex = i;
-            }
-        }
-        
-        const moveString = this.indexToMove(bestMoveIndex);
-        
-        if (moveString) {
-            const fromSquare = moveString.substring(0, 2);
-            const toSquare = moveString.substring(2, 4);
-            
-            return {
-                from: this.algebraicToCoordinates(fromSquare),
-                to: this.algebraicToCoordinates(toSquare)
-            };
-        }
-        
-        return null;
-    }
-
-    getMoveToIndex() {
-        if (!this.moveToIndex) {
-            this.moveToIndex = {};
-            this.indexToMoveMap = {};
-            let index = 0;
-            
-            for (let fromSq = 0; fromSq < 64; fromSq++) {
-                for (let toSq = 0; toSq < 64; toSq++) {
-                    if (fromSq !== toSq) {
-                        const fromName = this.squareIndexToName(fromSq);
-                        const toName = this.squareIndexToName(toSq);
-                        const moveString = fromName + toName;
-                        
-                        this.moveToIndex[moveString] = index;
-                        this.indexToMoveMap[index] = moveString;
-                        index++;
-                    }
-                }
-            }
-        }
-        return this.moveToIndex;
-    }
-
-    indexToMove(index) {
-        if (!this.indexToMoveMap) {
-            this.getMoveToIndex(); 
-        }
-        return this.indexToMoveMap[index] || null;
-    }
-
-    squareIndexToName(squareIndex) {
-        const file = squareIndex % 8;
-        const rank = Math.floor(squareIndex / 8);
-        const fileName = String.fromCharCode(97 + file); 
-        const rankName = (8 - rank).toString(); 
-        return fileName + rankName;
-    }
-
-    algebraicToCoordinates(algebraic) {
-        const file = algebraic.charCodeAt(0) - 97; 
-        const rank = parseInt(algebraic[1]) - 1;   
-        return {
-            x: file,
-            y: 7 - rank 
-        };
-    }
-
-    async getBestMove(board) {
+    async minimaxEval(board) {
         await this.loadModel();
         
-        const pieces = board.getPieceByColor(this.color);
+        const boardData = this.boardToTensor(board);
+        const prediction = this.model.predict(tf.tensor4d([boardData], [1, 14, 8, 8]));
+        const evaluation = prediction.dataSync()[0];
+        
+        prediction.dispose();
+        
+        return evaluation;
+    }
+
+    isGameOver(board) {
+        return utils.isCheckmate(this.color, board) || 
+               utils.isDraw(this.color, board);
+    }
+
+    getAllValidMoves(board, color) {
+        const pieces = board.getPieceByColor(color);
         const allValidMoves = [];
         
         for (const piece of pieces) {
-            const validMoves = utils.getValidMoves(this.color, piece, board);
+            const validMoves = utils.getValidMoves(piece, board);
             validMoves.forEach(move => {
                 allValidMoves.push({
                     piece: piece,
@@ -138,30 +103,151 @@ class Computer {
             });
         }
         
-        if (allValidMoves.length === 0) {
-            return null; 
+        return allValidMoves;
+    }
+
+    makePseudoMove(board, move) {
+        // Store original state for undo
+        const originalPiece = board.getPieceAt(move.to.x, move.to.y);
+        const movingPiece = board.getPieceAt(move.from.x, move.from.y);
+        const originalPosition = { ...move.from };
+        
+        if (!movingPiece) {
+            console.error('No piece at source position:', move.from);
+            return null;
         }
         
-        const boardData = this.boardToTensor(board);
-        const prediction = this.model.predict(tf.tensor4d([boardData], [1, 8, 8, 12]));
-        const modelMove = this.outputToMove(prediction, board);
+        // Make the move
+        board.setPieceAt(move.to.x, move.to.y, movingPiece);
+        board.setPieceAt(move.from.x, move.from.y, null);
+        movingPiece.position = { x: move.to.x, y: move.to.y };
         
-        let bestMove = allValidMoves[0]; 
-        let minDistance = Infinity;
+        // Switch current player
+        const originalCurrentPlayer = board.currentPlayer;
+        board.currentPlayer = board.currentPlayer === 'white' ? 'black' : 'white';
         
-        for (const move of allValidMoves) {
-            const distance = Math.abs(move.from.x - modelMove.from.x) + 
-                           Math.abs(move.from.y - modelMove.from.y) + 
-                           Math.abs(move.to.x - modelMove.to.x) + 
-                           Math.abs(move.to.y - modelMove.to.y);
-            
-            if (distance < minDistance) {
-                minDistance = distance;
-                bestMove = move;
+        return { 
+            originalPiece, 
+            movingPiece, 
+            originalPosition,
+            originalCurrentPlayer
+        };
+    }
+
+    undoMove(board, move, moveState) {
+        if (!moveState || !moveState.movingPiece) {
+            console.error('Invalid move state for undo');
+            return;
+        }
+        
+        // Restore pieces
+        board.setPieceAt(move.from.x, move.from.y, moveState.movingPiece);
+        board.setPieceAt(move.to.x, move.to.y, moveState.originalPiece);
+        
+        // Restore moving piece position
+        moveState.movingPiece.position = { ...moveState.originalPosition };
+        
+        // Restore current player
+        board.currentPlayer = moveState.originalCurrentPlayer;
+    }
+
+    async minimax(board, depth, alpha, beta, maximizingPlayer) {
+        if (depth === 0 || this.isGameOver(board)) {
+            return await this.minimaxEval(board);
+        }
+
+        const currentColor = maximizingPlayer ? 'white' : 'black';
+        const validMoves = this.getAllValidMoves(board, currentColor);
+
+        if (validMoves.length === 0) {
+            // No valid moves - could be checkmate or stalemate
+            if (utils.isInCheck(currentColor, board)) {
+                // Checkmate - return extreme value
+                return maximizingPlayer ? -10000 : 10000;
+            } else {
+                // Stalemate - return neutral value
+                return 0;
             }
         }
+
+        if (maximizingPlayer) {
+            let maxEval = -Infinity;
+            
+            for (const move of validMoves) {
+                const moveState = this.makePseudoMove(board, move);
+                if (moveState) {
+                    const evaluation = await this.minimax(board, depth - 1, alpha, beta, false);
+                    this.undoMove(board, move, moveState);
+                    
+                    maxEval = Math.max(maxEval, evaluation);
+                    alpha = Math.max(alpha, evaluation);
+                    
+                    if (beta <= alpha) {
+                        break; // Alpha-beta pruning
+                    }
+                }
+            }
+            
+            return maxEval;
+        } else {
+            let minEval = Infinity;
+            
+            for (const move of validMoves) {
+                const moveState = this.makePseudoMove(board, move);
+                if (moveState) {
+                    const evaluation = await this.minimax(board, depth - 1, alpha, beta, true);
+                    this.undoMove(board, move, moveState);
+                    
+                    minEval = Math.min(minEval, evaluation);
+                    beta = Math.min(beta, evaluation);
+                    
+                    if (beta <= alpha) {
+                        break; // Alpha-beta pruning
+                    }
+                }
+            }
+            
+            return minEval;
+        }
+    }
+
+    async getBestMove(board) {
+        await this.loadModel();
         
-        prediction.dispose(); 
+        const validMoves = this.getAllValidMoves(board, this.color);
+        
+        if (validMoves.length === 0) {
+            return null;
+        }
+
+        let bestMove = null;
+        let bestEval = this.color === 'white' ? -Infinity : Infinity;
+        
+        for (let i = 0; i < validMoves.length; i++) {
+            const move = validMoves[i];
+            
+            const moveState = this.makePseudoMove(board, move);
+            if (moveState) {
+                const evaluation = await this.minimax(
+                    board, 
+                    this.searchDepth - 1, 
+                    -Infinity, 
+                    Infinity, 
+                    this.color === 'black' // White minimizes, Black maximizes
+                );
+                this.undoMove(board, move, moveState);
+                
+                // White wants higher (more positive) scores
+                // Black wants lower (more negative) scores
+                if (this.color === 'white' && evaluation > bestEval) {
+                    bestEval = evaluation;
+                    bestMove = move;
+                } else if (this.color === 'black' && evaluation < bestEval) {
+                    bestEval = evaluation;
+                    bestMove = move;
+                }
+            }
+        }
         
         return bestMove;
     }
@@ -170,7 +256,8 @@ class Computer {
         return new Promise(async (resolve) => {
             this.isActive = true;
             
-            utils.checkForCheck(this.color, board);
+            // Remove this line - it's causing the error during minimax search
+            // utils.checkForCheck(this.color, board);
             
             setTimeout(async () => {
                 const bestMove = await this.getBestMove(board);
@@ -191,7 +278,7 @@ class Computer {
                     this.isActive = false;
                     resolve();
                 }
-            }, 1000); 
+            }, 1000);
         });
     }
 }
