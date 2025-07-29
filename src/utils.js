@@ -8,6 +8,10 @@ class Utils {
     isInCheck(color, board) {
         const kingPosition = board.findKing(color);
 
+        if (!kingPosition) {
+            return false; 
+        }
+
         for (let row = 0; row < 8; row++) {
             for (let col = 0; col < 8; col++) {
                 const piece = board.getPieceAt(row, col);

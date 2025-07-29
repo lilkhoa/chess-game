@@ -156,7 +156,7 @@ class Computer {
             return await this.minimaxEval(board);
         }
 
-        const currentColor = maximizingPlayer ? 'white' : 'black';
+        const currentColor = maximizingPlayer ? this.color : (this.color === 'white' ? 'black' : 'white');
         const validMoves = this.getAllValidMoves(board, currentColor);
 
         if (validMoves.length === 0) {
@@ -233,7 +233,7 @@ class Computer {
                     this.searchDepth - 1, 
                     -Infinity, 
                     Infinity, 
-                    this.color === 'black' // White minimizes, Black maximizes
+                    true 
                 );
                 this.undoMove(board, move, moveState);
                 
@@ -248,7 +248,7 @@ class Computer {
                 }
             }
         }
-        
+        console.log(bestEval);
         return bestMove;
     }
 
