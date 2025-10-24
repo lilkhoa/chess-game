@@ -53,28 +53,6 @@ chess-game/
 2. Open `index.html` directly in your web browser
 3. Ensure you have an internet connection for TensorFlow.js to load
 
-## How to Play
-
-### Game Modes
-- **Human vs Human**: Traditional two-player chess
-- **Human vs Computer**: Challenge the AI opponent
-- **Side Selection**: Choose to play as White or Black against the computer
-
-### Controls
-- **Click to Select**: Click on a piece to select it
-- **Click to Move**: Click on a highlighted square to move
-- **Game Info**: View current player, game status, and move history
-- **Reset Game**: Start a new game at any time
-
-### Chess Rules Implemented
-- ✅ All standard piece movements
-- ✅ Castling (kingside and queenside)
-- ✅ En passant capture
-- ✅ Pawn promotion with piece selection
-- ✅ Check and checkmate detection
-- ✅ Stalemate and draw conditions
-- ✅ Move validation and legal move highlighting
-
 ## Development
 
 ### Model Training
@@ -88,8 +66,9 @@ The AI models were trained using:
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
-- TensorFlow.js team for machine learning framework
 - [Chess Evaluations Dataset](https://www.kaggle.com/datasets/ronakbadhe/chess-evaluations) for traning data. 
 
----
-**Enjoy playing chess.**
+## Demo video
+You can watch the demo video of the project here: [Chess Game Demo](https://youtu.be/JVDD2ICqZLI)
+
+**Made by lilkhoa.**
